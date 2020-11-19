@@ -18,6 +18,7 @@ def iSMA(rates_frame, sma_period, applied_price):
     return:
         rates_frame (pandas.DataFrame) 价格数据，简单移动平均线数据
     """
+    print('开始计算SMA{0}'.format(sma_period))
     rates_frame['SMA{0}'.format(sma_period)] = rates_frame[applied_price].rolling(sma_period, min_periods=sma_period).mean()  
     return rates_frame
 
@@ -30,6 +31,7 @@ def iEMA(rates_frame, ema_period, applied_price):
     return:
         rates_frame (pandas.DataFrame) 价格数据，指数移动平均线数据
     """
+    print('开始计算EMA{0}'.format(ema_period))
     rates_frame['EMA{0}'.format(ema_period)] = rates_frame[applied_price].ewm(ema_period, span=ema_period).mean()  
     return rates_frame
 
@@ -43,6 +45,7 @@ def iBands(rates_frame, bands_period, deviation, applied_price):
     return:
         rates_frame (pandas.DataFrame) 价格数据，布林带数据
     """
+    print('开始计算 ibands {0}, {1}'.format(bands_period, deviation))
     # 计算均线
     rates_frame['median'] = rates_frame[applied_price].rolling(bands_period, min_periods=bands_period).mean()  
     # 计算上轨、下轨道

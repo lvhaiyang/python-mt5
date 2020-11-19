@@ -69,6 +69,8 @@ class Mt5Client:
             timeframe (mt5.TIMEFRAME): mt5时间框架,eg mt5.TIMEFRAME_M1
             start_time (string): 下载历史记录的开始时间,eg 2020-01-01
             end_time (string): 下载历史记录的结束时间,eg 2020-01-01
+        Return:
+            pd.DataFrame
         """
         mt5_timeframe = mt5.TIMEFRAME_M1
         if timeframe == "M1":
@@ -121,7 +123,8 @@ class Mt5Client:
         else:
             print("历史数据已经存在路径 {0}".format(csv_filepath))
         
-        return rates
+        rates_frame = pd.DataFrame(rates)
+        return rates_frame
 
 if __name__ == "__main__":
     client = Mt5Client(account_number=6042573, password='aqwrds7v', server_name='Swissquote-Server')

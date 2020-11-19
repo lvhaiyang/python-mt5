@@ -9,7 +9,15 @@ import MetaTrader5 as mt5
 import pytz, os, csv
 
 
-class Mt5Client():
+class Mt5Client:
+    M1 = 'M1'
+    M5 = 'M5'
+    M15 = 'M15'
+    M30 = 'M30'
+    H1 = 'H1'
+    H4 = 'H4'
+    D1 = 'D1'
+
     def __init__(self, account_number, password, server_name, mt5_path=None):
         """初始化MT5客户端
 
@@ -97,22 +105,27 @@ class Mt5Client():
             result.append(value)
 
         work_dir = os.path.dirname(os.path.abspath(__file__))
-        print(work_dir)
         csv_path = os.path.abspath(os.path.join(work_dir, '..', 'data', symbol, timeframe))
         if not os.path.exists(csv_path):
             print("目录 {0} 不存在, 自动创建目录".format(csv_path))
             os.makedirs(csv_path)
 
         csv_filename = "{0}_{1}_{2}_{3}.csv".format(symbol, timeframe, ''.join(start_time_list), ''.join(end_time_list)) 
-        print("开始将历史数据写入csv文件 {0}".format(os.path.join(csv_path, csv_filename)))
-        with open(os.path.join(csv_path, csv_filename), 'w', newline='') as fp:
-            csv_writer = csv.writer(fp)
-            csv_writer.writerows(result)
-        print("历史数据写入成功")
+        csv_filepath = os.path.join(csv_path, csv_filename)
+        if not os.path.exists(csv_filepath):
+            print("开始将历史数据写入csv文件 {0}".format(csv_filepath))
+            with open(csv_filepath, 'w', newline='') as fp:
+                csv_writer = csv.writer(fp)
+                csv_writer.writerows(result)
+            print("历史数据写入成功")
+        else:
+            print("历史数据已经存在路径 {0}".format(csv_filepath))
+        
+        return rates
 
 if __name__ == "__main__":
     client = Mt5Client(account_number=6042573, password='aqwrds7v', server_name='Swissquote-Server')
-    client.download_data("EURUSD", "M1", "2020-11-01", "2020-11-10")
+    client.download_data("EURUSD", Mt5Client.M1, "2020-11-01", "2020-11-10")
     client.shutdown()
 
     

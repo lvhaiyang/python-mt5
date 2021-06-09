@@ -126,6 +126,59 @@ class Mt5Client:
         rates_frame = pd.DataFrame(rates)
         return rates_frame
 
+    def open_order(self, magic, symbol, lot, order_type, cmt):
+        """建仓
+        magic: 幻数 eg. 123456789
+        symbol：品种 eg. EURUSD
+        lot: 仓位 eg. 0.1
+        order_type: 建仓类型  eg. ‘BUY' or 'SELL'
+        cmt: 注释
+        """
+        request_order_type = mt5.ORDER_TYPE_SELL
+        if order_type == "BUY":
+            request_order_type = mt5.ORDER_TYPE_BUY
+
+        request = { 
+            "magic": magic, 
+            "symbol": symbol, 
+            "action": mt5.TRADE_ACTION_DEAL, 
+            "volume": lot, 
+            "type": request_order_type, 
+            "deviation": 5,     
+            "comment": cmt, 
+            } 
+        result = mt5.order_send(request) 
+
+    def close_order(self, magic, symbol, lot, cmt):
+        """平仓
+        magic: 幻数 eg. 123456789
+        symbol：品种 eg. EURUSD
+        lot: 仓位 eg. 0.1
+        cmt: 注释
+        ticket: 订单号
+        """
+        # 获取symbol的未结持仓 
+        positions=mt5.positions_get(symbol=symbol) 
+        if positions==None: 
+            print("No positions on {0}, error code={1}".format(symbol, mt5.last_error())) 
+        elif len(positions)>0: 
+            print("Total positions on {0} = {1}".format(symbol, len(positions))
+            # display all open positions 
+            for position in positions:
+                print(position) 
+                ticket = position["ticket"]
+                request = { 
+                    "magic": magic, 
+                    "symbol": symbol, 
+                    "action": mt5.TRADE_ACTION_CLOSE_BY, 
+                    "volume": lot, 
+                    "type": mt5.ORDER_TYPE_CLOSE_BY, 
+                    "deviation": 5,     
+                    "comment": cmt, 
+                    "position_by": ticket,
+                    } 
+                result = mt5.order_send(request) 
+
 if __name__ == "__main__":
     client = Mt5Client(account_number=6042573, password='aqwrds7v', server_name='Swissquote-Server')
     client.download_data("EURUSD", Mt5Client.M1, "2020-11-01", "2020-11-10")
